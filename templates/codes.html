@@ -1,0 +1,139 @@
+{% load static %}<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>UrlShortener</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  </head>
+  <body>
+    <div class="container">
+
+
+    {% if messages %}
+
+    {% for message in messages %}
+    <!--  -->
+      {% if message.tags == 'success'%}
+      <div class="mb-3">
+      <p>Link created</p>
+      <input id="myInput" class="form-control form-control-lg" type="text" placeholder="ShortenLink" value="{{ message }}" aria-label=".form-control-lg example">
+      </div>
+      <button id="linkCopy" class="btn btn-dark" onclick="copylink()">Copy</button>
+      <script>
+        function copylink(){
+          // Get the text field
+        var copyText = document.getElementById("myInput");
+        var button = document.getElementById("linkCopy")
+        // Select the text field
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); // For mobile devices
+        button.innerHTML = "Copied!";
+            button.style.backgroundColor = "grey";
+            setTimeout(function() {
+              button.innerHTML = "Copy";
+              button.style.backgroundColor = "";
+            }, 3000);
+          
+        // Copy the text inside the text field
+        navigator.clipboard.writeText(copyText.value);
+        }
+      </script>
+      {% elif message.tags == 'error'%}
+      
+      <div class="p-3 m-0 border-0 bd-example">
+        
+        
+    
+        <form action="{{ site }}create/" method="POST">
+          <div class="alert alert-secondary" role="alert">{{message}}</div>
+          {% csrf_token %}
+          <div class="mb-3">
+            
+          <input class="form-control form-control-lg" type="text" placeholder="Link" name="Link" aria-label=".form-control-lg example">
+          <div class="form-text">Enter the link you want to Shorten</div>
+          </div>
+          <div class="mb-3">
+          <input class="form-control form-control-lg" type="text" placeholder="Name" name="Name" aria-label="default input example">
+          <div class="form-text">Enter name (optional)</div>
+        </div>
+          <button type="submit" style="align-self: center;" class="btn btn-dark">Shorten</button>
+      </form>
+    </div>
+
+      {% endif %}
+
+    {% endfor %}
+  
+    {% else %}
+    <div class="p-3 m-0 border-0 bd-example">
+
+    
+      <form action="{{site}}create/" method="POST" style="align-content: center;">
+        {% csrf_token %}
+        <div class="mb-3">
+          
+        <input class="form-control form-control-lg" type="text" placeholder="Link" name="Link" aria-label=".form-control-lg example">
+        <div class="form-text">Enter the link you want to Shorten</div>
+        </div>
+        <div class="mb-3">
+        <input class="form-control form-control-lg" type="text" placeholder="Name" name="Name" aria-label="default input example">
+        <div class="form-text">Enter name (optional)</div>
+      </div>
+        <button type="submit" style="align-self: center;" class="btn btn-dark">Shorten</button>
+    </form>
+  </div>
+    {% endif %}
+
+
+      <ol class="breadcrumb my-4">
+        <li class="breadcrumb-item active">Urls</li>
+      </ol>
+      <table class="table">
+        <thead class="thead-inverse">
+          <tr>
+            <th>Link</th>
+            <th>Name</th>
+            <th>Url</th>
+            <th>Copy</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for url in Urls %}
+            <tr>
+              <td>
+                {{ url.link }}
+              </td>
+              <td>
+                {{ url.name}}
+              </td>
+              <td>
+              <a id="texttocopy{{ url.id }}" href="{{site}}re/{{ url.code}}">{{site}}re/{{ url.code}}</a>
+              </td>
+              <td>
+                <button id="copy-button{{ url.id }}" onclick="copyfunction{{ url.id }}()" class="btn btn-dark">Copy</button>
+              </td>
+            </tr>
+            <script>
+            function copyfunction{{ url.id }}() {
+            var button = document.getElementById("copy-button{{ url.id}}");
+            var text = document.getElementById("texttocopy{{ url.id}}");
+            var selection = window.getSelection();
+            var range = document.createRange();
+            range.selectNodeContents(text);
+            selection.removeAllRanges();
+            selection.addRange(range);
+            document.execCommand("copy");
+            button.innerHTML = "Copied!";
+            button.style.backgroundColor = "grey";
+            setTimeout(function() {
+              button.innerHTML = "Copy";
+              button.style.backgroundColor = "";
+            }, 3000);
+          }
+          </script>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>
